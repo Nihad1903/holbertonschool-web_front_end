@@ -727,7 +727,7 @@ textarea:focus {
 
 .form-group:focus-within {
   background-color: var(--color-light-grey);
-  transition: background-color 0.3s;
+  transition: 0.3s;
 }
 
 /* Form field
