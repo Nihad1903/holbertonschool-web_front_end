@@ -11,45 +11,78 @@
     <body>
 
         <script type="application/javascript">
-            function createFamilyTree() {
-                $("body").append(
-                    $("<table>").append(
-                        $("<thead>").append(
-                            $("<tr>").append(
-                                $("<th>").text("Firstname"),
-                                $("<th>").text("Lastname")
-                            )
-                        ),
-                        $("<tbody>")
-                    )
-                );
+            function createSearchForm() {
+                const input = $("<input>").attr("type", "text");
+                const submit = $("<input>").attr("type", "submit").val("Search");
+                const list = $("<ul>");
+
+                $("body").append(input, submit, list);
+
+                submit.click(function (event) {
+                    event.preventDefault();
+                    const search = $("input[type='text']").val();
+                    queryWikipedia(search);
+                });
             }
 
-            function addNewMember(firstName, lastName) {
-                $("tbody").append(
-                    $("<tr>").append(
-                        $("<td>").text(firstName),
-                        $("<td>").text(lastName),
-                        $("<td>").text("(x)")
-                            .css("background-color", "orange")
-                            .click(function() {
-                                $(this).parent().remove();
-                            })
-                    )
+            function addNewArticle(id, title, snippet) {
+                const safeId = (id !== undefined && id !== null) ? String(id) : "N/A";
+
+                const listItem = $("<li>").append(
+                    $("<p>").append(
+                        $("<span>").text(safeId + " - "),
+                        $("<b>").text(title)
+                    ),
+                    $("<p>").html(snippet)
                 );
+
+                $("ul").append(listItem);
             }
 
-            // Create the initial table
-            createFamilyTree();
+            function queryWikipedia(search) {
+                if (!search || !search.trim()) {
+                    $("ul").empty().append($("<li>").text("Please enter a search term."));
+                    return;
+                }
 
-            // Add members
-            addNewMember("Guillaume", "Salva");
-            addNewMember("Arielle", "Snizt");
-            addNewMember("Fanette", "Snizt");
-            addNewMember("Gerard", "Snizt");
-            addNewMember("Victor", "Salva");
+                const data = {
+                    action: "query",
+                    list: "search",
+                    srsearch: search,
+                    format: "json",
+                    origin: "*"
+                };
+
+                $.ajax({
+                    url: "https://en.wikipedia.org/w/api.php",
+                    method: "GET",
+                    data: data,
+                    success: function (response) {
+                        $("ul").empty();
+                        const results = (response && response.query && response.query.search) ? response.query.search : [];
+                        results.forEach(result => {
+                            console.log("wiki result:", result);
+                            const pid = result.pageid || result.pageId || result.title || "N/A";
+                            addNewArticle(pid, result.title || "No title", result.snippet || "");
+                        });
+
+                        if (results.length === 0) {
+                            $("ul").append($("<li>").text("No results found."));
+                        }
+                    },
+                    error: function (xhr, status, err) {
+                        $("ul").empty().append(
+                            $("<li>").text("Error fetching data from Wikipedia: " + status)
+                        );
+                        console.error("Wikipedia API error:", status, err);
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                createSearchForm();
+            });
         </script>
-
     </body>
 
 </html>
