@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h2>Log in to the website</h2>
+    <input type="text" name="firstname" placeholder="Firstname" id="firstname">
+    <input type="text" name="email" placeholder="Email" id="email">
+    <button onclick="setCookies()">Log me in</button>
+    
+    <h2>Cookies</h2>
+    <button onclick="showCookies()">Show the cookies</button>
+
+</body>
+
+<script>
+    function setCookies() {
+        const firstname = document.getElementById("firstname").value;
+        const email = document.getElementById("email").value;
+
+        const d = new Date();
+        d.setTime(d.getTime() + (10 * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + d.toUTCString();
+
+        document.cookie = `firstname=${firstname}; ${expires}; path=/`;
+        document.cookie = `email=${email}; ${expires}; path=/`;
+    }
+
+    function getCookie(name) {
+        const decodedCookies = decodeURIComponent(document.cookie);
+        const cookies = decodedCookies.split('; ');
+        for (let cookie of cookies) {
+            const [key, value] = cookie.split('=');
+            if (key === name) {
+                return value;
+            }
+        }
+        return "";
+    }
+
+    function showCookies() {
+        const email = getCookie("email");
+        const firstname = getCookie("firstname");
+
+        const p = document.createElement("p");
+        p.innerHTML = `Email: ${email} - Firstname: ${firstname}`;
+        document.body.appendChild(p);
+    }
+</script>
+</html>
