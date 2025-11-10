@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Shopping Cart</title>
+</head>
+<body>
+
+<script>
+    // Array of available items
+    const availableItems = ["Shampoo", "Soap", "Sponge", "Water"];
+
+    // Check if localStorage is supported
+    if (typeof(Storage) === "undefined") {
+        alert("Sorry, your browser does not support Web storage. Try again with a better one");
+    } else {
+        createStore();
+        displayCart();
+    }
+
+    // Function to add item to cart (localStorage)
+    function addItemToCart(item) {
+        localStorage.setItem(item, "true");
+    }
+
+    // Function to create the store UI
+    function createStore() {
+        const ul = document.createElement("ul");
+
+        availableItems.forEach(item => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            li.style.cursor = "pointer";
+            li.onclick = () => addItemToCart(item);
+            ul.appendChild(li);
+        });
+
+        document.body.appendChild(ul);
+    }
+
+    // Function to display cart info
+    function displayCart() {
+        const itemsCount = localStorage.length;
+
+        if (itemsCount > 0) {
+            const p = document.createElement("p");
+            p.textContent = `You previously had ${itemsCount} items in your cart`;
+            document.body.appendChild(p);
+        }
+    }
+</script>
+
+</body>
+</html>
